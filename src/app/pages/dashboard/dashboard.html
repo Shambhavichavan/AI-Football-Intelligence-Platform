@@ -1,0 +1,18 @@
+<div class="dashboard">
+  <h1>Matches</h1>
+  <div class="matches-container">
+    <div class="match-card" *ngFor="let match of matches">
+      <div class="match-teams">
+        <span class="home-team">{{ match.homeTeam.name }}</span>
+        <span class="vs">vs</span>
+        <span class="away-team">{{ match.awayTeam.name }}</span>
+      </div>
+      <div class="match-score" *ngIf="match.score.fullTime.home !== null">
+        {{ match.score.fullTime.home }} - {{ match.score.fullTime.away }}
+      </div>
+      <div class="match-status" *ngIf="match.score.fullTime.home === null">
+        {{ match.status }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+.matches-page {
+	padding: 28px;
+	color: #eef6ff;
+}
+
+h1 {
+	margin-bottom: 22px;
+}
+
+.section-block {
+	margin-bottom: 28px;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 16px;
+}
+
+.card {
+	background: rgba(255, 255, 255, 0.94);
+	color: #1b2a38;
+	border-radius: 12px;
+	padding: 16px;
+}
+
+.teams {
+	font-weight: 700;
+	margin-bottom: 6px;
+}
+
+.meta {
+	color: #4d5a66;
+}
+
+.empty {
+	opacity: 0.9;
+}

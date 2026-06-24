@@ -1,0 +1,29 @@
+<div class="matches-page">
+	<h1>Matches Center</h1>
+
+	<section class="section-block">
+		<h2>Live Matches</h2>
+		<div class="grid" *ngIf="liveMatches.length > 0; else noLive">
+			<article class="card" *ngFor="let match of liveMatches">
+				<div class="teams">{{ match.homeTeam.name }} vs {{ match.awayTeam.name }}</div>
+				<div class="meta">Status: {{ match.status }}</div>
+			</article>
+		</div>
+		<ng-template #noLive>
+			<p class="empty">No live matches right now.</p>
+		</ng-template>
+	</section>
+
+	<section class="section-block">
+		<h2>Upcoming Matches</h2>
+		<div class="grid" *ngIf="upcomingMatches.length > 0; else noUpcoming">
+			<article class="card" *ngFor="let match of upcomingMatches">
+				<div class="teams">{{ match.homeTeam.name }} vs {{ match.awayTeam.name }}</div>
+				<div class="meta">Kickoff: {{ match.utcDate | date: 'medium' }}</div>
+			</article>
+		</div>
+		<ng-template #noUpcoming>
+			<p class="empty">No upcoming matches available.</p>
+		</ng-template>
+	</section>
+</div>
