@@ -1,0 +1,34 @@
+<div class="teams-page">
+	<h1>Team Form Table</h1>
+
+	<div class="table-wrap" *ngIf="teams.length > 0; else noTeams">
+		<table>
+			<thead>
+				<tr>
+					<th>Team</th>
+					<th>P</th>
+					<th>W</th>
+					<th>D</th>
+					<th>L</th>
+					<th>GF</th>
+					<th>GA</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let team of teams">
+					<td>{{ team.name }}</td>
+					<td>{{ team.played }}</td>
+					<td>{{ team.wins }}</td>
+					<td>{{ team.draws }}</td>
+					<td>{{ team.losses }}</td>
+					<td>{{ team.goalsFor }}</td>
+					<td>{{ team.goalsAgainst }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<ng-template #noTeams>
+		<p class="empty">No completed match data yet.</p>
+	</ng-template>
+</div>

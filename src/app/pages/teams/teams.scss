@@ -1,0 +1,35 @@
+.teams-page {
+	padding: 28px;
+	color: #eef6ff;
+}
+
+h1 {
+	margin-bottom: 20px;
+}
+
+.table-wrap {
+	overflow-x: auto;
+	background: rgba(255, 255, 255, 0.95);
+	border-radius: 12px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	color: #1b2a38;
+}
+
+th,
+td {
+	padding: 12px;
+	text-align: left;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+thead {
+	background: #e9f3fb;
+}
+
+.empty {
+	opacity: 0.9;
+}

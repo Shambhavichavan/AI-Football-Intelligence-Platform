@@ -1,0 +1,51 @@
+<div class="analytics">
+  <h1>Team Analytics</h1>
+  
+  <div class="stats-overview">
+    <h2>Overall Performance</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Wins</div>
+        <div class="stat-value">{{ stats.wins }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Draws</div>
+        <div class="stat-value">{{ stats.draws }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Losses</div>
+        <div class="stat-value">{{ stats.losses }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Win %</div>
+        <div class="stat-value">{{ stats.winPercentage }}%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Goals Scored</div>
+        <div class="stat-value">{{ stats.goalsScored }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Goals Conceded</div>
+        <div class="stat-value">{{ stats.goalsConceded }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-section">
+    <h2>Performance Charts</h2>
+    <div class="charts-grid">
+      <div class="chart-container">
+        <h3>Match Results</h3>
+        <canvas #winPercentageChart></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Goals Scored</h3>
+        <canvas #goalsScoredChart></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Goals Conceded</h3>
+        <canvas #goalsConcededChart></canvas>
+      </div>
+    </div>
+  </div>
+</div>
