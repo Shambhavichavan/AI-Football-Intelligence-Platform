@@ -29,7 +29,9 @@ public class FootballService {
                                 match.getHomeTeam(),
                                 match.getAwayTeam(),
                                 match.getLeague(),
-                                match.getStatus()
+                                match.getStatus(),
+                                match.getHomeScore(),
+                                match.getAwayScore()
                         )
                 )
                 .toList();

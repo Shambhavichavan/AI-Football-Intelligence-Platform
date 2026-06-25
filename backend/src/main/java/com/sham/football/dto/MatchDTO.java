@@ -6,6 +6,8 @@ public class MatchDTO {
     private String awayTeam;
     private String league;
     private String status;
+    private Integer homeScore;
+    private Integer awayScore;
 
     public MatchDTO() {
     }
@@ -20,6 +22,15 @@ public class MatchDTO {
         this.awayTeam = awayTeam;
         this.league = league;
         this.status = status;
+    }
+
+    public MatchDTO(String homeTeam, String awayTeam, String league, String status, Integer homeScore, Integer awayScore) {
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+        this.league = league;
+        this.status = status;
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
     }
 
     public String getHomeTeam() {
@@ -52,5 +63,21 @@ public class MatchDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getHomeScore() {
+        return homeScore;
+    }
+
+    public void setHomeScore(Integer homeScore) {
+        this.homeScore = homeScore;
+    }
+
+    public Integer getAwayScore() {
+        return awayScore;
+    }
+
+    public void setAwayScore(Integer awayScore) {
+        this.awayScore = awayScore;
     }
 }

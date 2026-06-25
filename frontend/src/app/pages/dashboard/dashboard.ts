@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Football } from '../../services/football';
 
@@ -11,11 +11,15 @@ import { Football } from '../../services/football';
 export class Dashboard implements OnInit {
   matches: any[] = [];
 
-  constructor(private footballService: Football) {}
+  constructor(
+    private footballService: Football,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.footballService.getMatches().subscribe((data: any) => {
-      this.matches = data.matches || [];
+      this.matches = Array.isArray(data) ? data : data?.value || data?.matches || [];
+      this.changeDetectorRef.detectChanges();
     });
   }
 }

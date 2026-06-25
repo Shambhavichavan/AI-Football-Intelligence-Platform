@@ -6,7 +6,7 @@
 		@if (liveMatches.length > 0) {
 			<div class="grid">
 				<article class="card" *ngFor="let match of liveMatches">
-					<div class="teams">{{ match.homeTeam.name }} vs {{ match.awayTeam.name }}</div>
+					<div class="teams">{{ match.homeTeam }} vs {{ match.awayTeam }}</div>
 					<div class="meta">Status: {{ match.status }}</div>
 				</article>
 			</div>
@@ -20,8 +20,8 @@
 		@if (upcomingMatches.length > 0) {
 			<div class="grid">
 				<article class="card" *ngFor="let match of upcomingMatches">
-					<div class="teams">{{ match.homeTeam.name }} vs {{ match.awayTeam.name }}</div>
-					<div class="meta">Kickoff: {{ match.utcDate | date: 'medium' }}</div>
+					<div class="teams">{{ match.homeTeam }} vs {{ match.awayTeam }}</div>
+					<div class="meta">Kickoff: {{ match.matchDate || 'TBD' }}</div>
 				</article>
 			</div>
 		} @else {

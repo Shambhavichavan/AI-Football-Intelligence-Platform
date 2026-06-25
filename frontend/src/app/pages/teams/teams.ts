@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Football } from '../../services/football';
 
@@ -21,12 +21,16 @@ type TeamStat = {
 export class Teams implements OnInit {
   teams: TeamStat[] = [];
 
-  constructor(private footballService: Football) {}
+  constructor(
+    private footballService: Football,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.footballService.getMatches().subscribe((data: any) => {
-      const matches = data?.matches || [];
+      const matches = Array.isArray(data) ? data : data?.value || data?.matches || [];
       this.teams = this.buildTeamStats(matches);
+      this.changeDetectorRef.detectChanges();
     });
   }
 
@@ -49,8 +53,8 @@ export class Teams implements OnInit {
     };
 
     matches.forEach((match: any) => {
-      const homeName = match?.homeTeam?.name;
-      const awayName = match?.awayTeam?.name;
+      const homeName = match?.homeTeam;
+      const awayName = match?.awayTeam;
       if (!homeName || !awayName) {
         return;
       }
@@ -58,10 +62,12 @@ export class Teams implements OnInit {
       const home = ensureTeam(homeName);
       const away = ensureTeam(awayName);
 
-      const homeGoals = match?.score?.fullTime?.home;
-      const awayGoals = match?.score?.fullTime?.away;
+      const homeGoals = match?.homeScore;
+      const awayGoals = match?.awayScore;
 
       if (homeGoals === null || awayGoals === null || homeGoals === undefined || awayGoals === undefined) {
+        home.played += 1;
+        away.played += 1;
         return;
       }
 

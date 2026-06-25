@@ -3,14 +3,14 @@
   <div class="matches-container">
     <div class="match-card" *ngFor="let match of matches">
       <div class="match-teams">
-        <span class="home-team">{{ match.homeTeam.name }}</span>
+        <span class="home-team">{{ match.homeTeam }}</span>
         <span class="vs">vs</span>
-        <span class="away-team">{{ match.awayTeam.name }}</span>
+        <span class="away-team">{{ match.awayTeam }}</span>
       </div>
-      <div class="match-score" *ngIf="match.score.fullTime.home !== null">
-        {{ match.score.fullTime.home }} - {{ match.score.fullTime.away }}
+      <div class="match-score" *ngIf="match.homeScore !== null && match.awayScore !== null">
+        {{ match.homeScore }} - {{ match.awayScore }}
       </div>
-      <div class="match-status" *ngIf="match.score.fullTime.home === null">
+      <div class="match-status" *ngIf="match.homeScore === null || match.awayScore === null">
         {{ match.status }}
       </div>
     </div>

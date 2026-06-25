@@ -1,8 +1,17 @@
 <div class="analytics">
   <h1>Team Analytics</h1>
   
-  <div class="stats-overview">
-    <h2>Overall Performance</h2>
+  <div class="team-selector">
+    <label for="teamSelect">Select Team:</label>
+    <select id="teamSelect" [(ngModel)]="selectedTeam" (change)="onTeamChange($event.target.value)">
+      <option value="" disabled>Choose a team...</option>
+      <option *ngFor="let team of teams" [value]="team">{{ team }}</option>
+    </select>
+  </div>
+  
+  @if (selectedTeam) {
+    <div class="stats-overview">
+      <h2>{{ selectedTeam }} - Performance</h2>
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-title">Wins</div>
@@ -48,4 +57,5 @@
       </div>
     </div>
   </div>
+  }
 </div>

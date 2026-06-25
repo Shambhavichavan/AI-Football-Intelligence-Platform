@@ -14,14 +14,15 @@ export class Football {
   }
 
   getUpcomingMatches() {
-    return this.http.get(`${this.apiUrl}/matches/upcoming`);
+    return this.http.get(`${this.apiUrl}/upcoming-matches`);
   }
 
   getLiveMatches() {
-    return this.http.get(`${this.apiUrl}/matches/live`);
+    return this.http.get(`${this.apiUrl}/live-matches`);
   }
 
-  getTeamForm() {
-    return this.http.get(`${this.apiUrl}/teams/form`);
+  getTeamForm(team?: string) {
+    const url = team ? `${this.apiUrl}/team-form?team=${encodeURIComponent(team)}` : `${this.apiUrl}/team-form`;
+    return this.http.get(url);
   }
 }

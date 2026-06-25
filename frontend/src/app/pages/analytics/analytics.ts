@@ -1,11 +1,12 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Football } from '../../services/football';
 import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-analytics',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './analytics.html',
   styleUrl: './analytics.scss',
 })
@@ -14,7 +15,9 @@ export class Analytics implements OnInit, OnDestroy {
   @ViewChild('goalsScoredChart', { static: false }) goalsScoredChart: ElementRef | undefined;
   @ViewChild('goalsConcededChart', { static: false }) goalsConcededChart: ElementRef | undefined;
 
-  teamForm: any = null;
+  matches: any[] = [];
+  teams: string[] = [];
+  selectedTeam: string = '';
   stats: any = {
     wins: 0,
     draws: 0,
@@ -22,31 +25,61 @@ export class Analytics implements OnInit, OnDestroy {
     goalsScored: 0,
     goalsConceded: 0,
     winPercentage: 0,
+    completedMatches: 0,
   };
 
   chartInstances: { [key: string]: Chart | undefined } = {};
 
-  constructor(private footballService: Football) {}
+  constructor(
+    private footballService: Football,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.footballService.getTeamForm().subscribe((data: any) => {
-      this.teamForm = data;
-      this.calculateStats(data);
+    // First, load all teams from matches
+    this.footballService.getMatches().subscribe((data: any) => {
+      this.matches = Array.isArray(data) ? data : data?.value || data?.matches || [];
+      this.extractTeams();
+      if (this.teams.length > 0) {
+        this.selectedTeam = this.teams[0];
+        this.loadTeamAnalytics(this.selectedTeam);
+      }
+    });
+  }
+
+  extractTeams(): void {
+    const teamSet = new Set<string>();
+    this.matches.forEach((match) => {
+      if (match.homeTeam) teamSet.add(match.homeTeam);
+      if (match.awayTeam) teamSet.add(match.awayTeam);
+    });
+    this.teams = Array.from(teamSet).sort();
+  }
+
+  onTeamChange(team: any): void {
+    const teamValue = team.target?.value || team;
+    this.selectedTeam = teamValue;
+    this.loadTeamAnalytics(teamValue);
+  }
+
+  loadTeamAnalytics(team: string): void {
+    this.footballService.getTeamForm(team).subscribe((data: any) => {
+      const teamData = Array.isArray(data) ? data[0] : data;
+      this.calculateStats(teamData);
+      this.changeDetectorRef.detectChanges();
       setTimeout(() => this.createCharts(), 100);
     });
   }
 
-  calculateStats(data: any): void {
-    if (data && data.matches) {
-      this.stats.wins = data.matches.filter((m: any) => m.result === 'W').length;
-      this.stats.draws = data.matches.filter((m: any) => m.result === 'D').length;
-      this.stats.losses = data.matches.filter((m: any) => m.result === 'L').length;
-      this.stats.goalsScored = data.matches.reduce((sum: number, m: any) => sum + (m.goalsFor || 0), 0);
-      this.stats.goalsConceded = data.matches.reduce((sum: number, m: any) => sum + (m.goalsAgainst || 0), 0);
-      
-      const totalMatches = this.stats.wins + this.stats.draws + this.stats.losses;
-      this.stats.winPercentage = totalMatches > 0 ? Math.round((this.stats.wins / totalMatches) * 100) : 0;
-    }
+  calculateStats(teamData: any): void {
+    this.stats.wins = teamData?.wins || 0;
+    this.stats.draws = teamData?.draws || 0;
+    this.stats.losses = teamData?.losses || 0;
+    this.stats.goalsScored = 0;
+    this.stats.goalsConceded = 0;
+
+    const totalMatches = this.stats.wins + this.stats.draws + this.stats.losses;
+    this.stats.winPercentage = totalMatches > 0 ? Math.round((this.stats.wins / totalMatches) * 100) : 0;
   }
 
   createCharts(): void {
