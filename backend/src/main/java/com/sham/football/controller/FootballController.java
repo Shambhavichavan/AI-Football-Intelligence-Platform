@@ -33,10 +33,10 @@ public class FootballController {
 
     @PostMapping("/load-data")
     public String loadData() {
-
+        // Load both sample data and fetch real matches from external API
         footballService.loadSampleData();
-
-        return "Loaded";
+        footballDataApiService.saveMatches();
+        return "Loaded sample data and fetched matches from football-data.org API";
     }
 
     @GetMapping("/live")
