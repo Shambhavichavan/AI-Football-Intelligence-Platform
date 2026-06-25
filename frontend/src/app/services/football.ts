@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -10,19 +9,19 @@ export class Football {
 
   constructor(private http: HttpClient) {}
 
-  getMatches(): Observable<any> {
+  getMatches() {
     return this.http.get(`${this.apiUrl}/matches`);
   }
 
-  getUpcomingMatches(): Observable<any> {
+  getUpcomingMatches() {
     return this.http.get(`${this.apiUrl}/matches/upcoming`);
   }
 
-  getLiveMatches(): Observable<any> {
+  getLiveMatches() {
     return this.http.get(`${this.apiUrl}/matches/live`);
   }
 
-  getTeamForm(): Observable<any> {
+  getTeamForm() {
     return this.http.get(`${this.apiUrl}/teams/form`);
   }
 }
