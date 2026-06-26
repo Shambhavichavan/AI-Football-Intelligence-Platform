@@ -5,9 +5,21 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class Football {
-  private apiUrl = 'http://localhost:8080';
+  private apiUrl = this.resolveApiUrl();
 
   constructor(private http: HttpClient) {}
+
+  private resolveApiUrl(): string {
+    if (typeof window === 'undefined') {
+      return 'http://localhost:8080/api';
+    }
+
+    if (window.location.hostname === 'localhost' && window.location.port === '4200') {
+      return 'http://localhost:8080/api';
+    }
+
+    return `${window.location.origin}/api`;
+  }
 
   getMatches() {
     return this.http.get(`${this.apiUrl}/matches`);
