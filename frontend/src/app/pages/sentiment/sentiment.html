@@ -1,0 +1,96 @@
+<div class="sentiment-page">
+  <h1>Fan Sentiment Intelligence</h1>
+
+  <div class="grid">
+    <section class="panel form-panel">
+      <h2>Analyze New Fan Message</h2>
+      <div class="form-grid">
+        <label>
+          Fan Name
+          <input type="text" [(ngModel)]="fanName" placeholder="Optional" />
+        </label>
+        <label>
+          Team
+          <input type="text" [(ngModel)]="team" placeholder="Team name" />
+        </label>
+      </div>
+      <label class="message-label">
+        Message
+        <textarea [(ngModel)]="message" rows="4" placeholder="How do fans feel after the match?"></textarea>
+      </label>
+      <button (click)="submit()" [disabled]="submitting || !team.trim() || !message.trim()">
+        {{ submitting ? 'Analyzing...' : 'Analyze Sentiment' }}
+      </button>
+      <p class="error" *ngIf="submitError">{{ submitError }}</p>
+    </section>
+
+    <section class="panel summary-panel" *ngIf="summary as s">
+      <h2>Summary</h2>
+      <div class="stats-grid">
+        <div class="stat-card"><span>Total</span><strong>{{ s.totalMentions }}</strong></div>
+        <div class="stat-card"><span>Positive</span><strong>{{ s.positiveMentions }}</strong></div>
+        <div class="stat-card"><span>Neutral</span><strong>{{ s.neutralMentions }}</strong></div>
+        <div class="stat-card"><span>Negative</span><strong>{{ s.negativeMentions }}</strong></div>
+      </div>
+
+      <div class="meter-group">
+        <div class="meter-row">
+          <span>Positive Share</span>
+          <span>{{ s.positivityRate }}%</span>
+        </div>
+        <div class="meter-track">
+          <div class="meter-positive" [style.width]="sentimentWidth(s.positiveMentions)"></div>
+        </div>
+
+        <div class="meter-row">
+          <span>Negative Share</span>
+          <span>{{ s.negativityRate }}%</span>
+        </div>
+        <div class="meter-track">
+          <div class="meter-negative" [style.width]="sentimentWidth(s.negativeMentions)"></div>
+        </div>
+      </div>
+
+      <div class="key-lines">
+        <p><strong>Overall Mood:</strong> {{ s.overallMood }}</p>
+        <p><strong>Top Positive Team:</strong> {{ s.topPositiveTeam }}</p>
+        <p><strong>Top Negative Team:</strong> {{ s.topNegativeTeam }}</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel table-panel">
+    <h2>Recent Sentiment Records</h2>
+    <p class="error" *ngIf="loadError">{{ loadError }}</p>
+    <div class="table-wrap" *ngIf="records.length > 0; else emptyState">
+      <table>
+        <thead>
+          <tr>
+            <th>Fan</th>
+            <th>Team</th>
+            <th>Message</th>
+            <th>Score</th>
+            <th>Label</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of records">
+            <td>{{ record.fanName }}</td>
+            <td>{{ record.team }}</td>
+            <td>{{ record.message }}</td>
+            <td>{{ record.score }}</td>
+            <td>
+              <span class="pill" [class.pos]="record.label === 'POSITIVE'" [class.neu]="record.label === 'NEUTRAL'" [class.neg]="record.label === 'NEGATIVE'">
+                {{ record.label }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #emptyState>
+      <p class="empty">No sentiment records available yet.</p>
+    </ng-template>
+  </section>
+</div>

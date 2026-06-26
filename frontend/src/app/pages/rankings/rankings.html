@@ -1,0 +1,15 @@
+<div class="rankings-page">
+  <h1>Power Rankings</h1>
+
+  @if (rankings.length > 0) {
+    <div class="ranking-grid">
+      <div class="ranking-card" *ngFor="let team of rankings; let i = index">
+        <div class="rank">#{{ i + 1 }}</div>
+        <div class="name">{{ team.name }}</div>
+        <div class="score">{{ team.rating }}</div>
+      </div>
+    </div>
+  } @else {
+    <p class="empty">No rankings yet.</p>
+  }
+</div>

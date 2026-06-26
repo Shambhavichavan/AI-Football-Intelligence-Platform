@@ -115,6 +115,45 @@
   }
 }
 
+.form-row {
+  margin-bottom: 28px;
+
+  h3 {
+    margin-bottom: 12px;
+  }
+}
+
+.form-badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  background: #2e7d32;
+
+  &.draw {
+    background: #e65100;
+  }
+
+  &.loss {
+    background: #c62828;
+  }
+}
+
+.no-form {
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .charts-section {
   margin-top: 48px;
 }

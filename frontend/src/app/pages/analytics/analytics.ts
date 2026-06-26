@@ -4,6 +4,27 @@ import { FormsModule } from '@angular/forms';
 import { Football } from '../../services/football';
 import Chart from 'chart.js/auto';
 
+type TeamFormResponse = {
+  team: string;
+  wins: number;
+  draws: number;
+  losses: number;
+  recentResults: string[];
+  form: string;
+};
+
+type TeamStatisticsResponse = {
+  team: string;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsScored: number;
+  goalsConceded: number;
+  winPercentage: number;
+  cleanSheets: number;
+  averageGoals: number;
+};
+
 @Component({
   selector: 'app-analytics',
   imports: [CommonModule, FormsModule],
@@ -18,6 +39,8 @@ export class Analytics implements OnInit, OnDestroy {
   matches: any[] = [];
   teams: string[] = [];
   selectedTeam: string = '';
+  recentResults: string[] = [];
+  currentForm: string = '-';
   stats: any = {
     wins: 0,
     draws: 0,
@@ -26,6 +49,8 @@ export class Analytics implements OnInit, OnDestroy {
     goalsConceded: 0,
     winPercentage: 0,
     completedMatches: 0,
+    cleanSheets: 0,
+    averageGoals: 0,
   };
 
   chartInstances: { [key: string]: Chart | undefined } = {};
@@ -63,23 +88,36 @@ export class Analytics implements OnInit, OnDestroy {
   }
 
   loadTeamAnalytics(team: string): void {
-    this.footballService.getTeamForm(team).subscribe((data: any) => {
-      const teamData = Array.isArray(data) ? data[0] : data;
-      this.calculateStats(teamData);
-      this.changeDetectorRef.detectChanges();
-      setTimeout(() => this.createCharts(), 100);
+    this.footballService.getTeamForm(team).subscribe((formData: any) => {
+      const teamForm = Array.isArray(formData) ? formData[0] : formData;
+      this.applyTeamForm(teamForm);
+
+      this.footballService.getTeamStatistics(team).subscribe((statsData: any) => {
+        const teamStats = Array.isArray(statsData) ? statsData[0] : statsData;
+        this.applyTeamStatistics(teamStats);
+        this.changeDetectorRef.detectChanges();
+        setTimeout(() => this.createCharts(), 100);
+      });
     });
   }
 
-  calculateStats(teamData: any): void {
+  applyTeamForm(teamData: TeamFormResponse): void {
     this.stats.wins = teamData?.wins || 0;
     this.stats.draws = teamData?.draws || 0;
     this.stats.losses = teamData?.losses || 0;
-    this.stats.goalsScored = 0;
-    this.stats.goalsConceded = 0;
+    this.recentResults = teamData?.recentResults || [];
+    this.currentForm = teamData?.form || '-';
+  }
 
-    const totalMatches = this.stats.wins + this.stats.draws + this.stats.losses;
-    this.stats.winPercentage = totalMatches > 0 ? Math.round((this.stats.wins / totalMatches) * 100) : 0;
+  applyTeamStatistics(teamData: TeamStatisticsResponse): void {
+    this.stats.wins = teamData?.wins || 0;
+    this.stats.draws = teamData?.draws || 0;
+    this.stats.losses = teamData?.losses || 0;
+    this.stats.goalsScored = teamData?.goalsScored || 0;
+    this.stats.goalsConceded = teamData?.goalsConceded || 0;
+    this.stats.cleanSheets = teamData?.cleanSheets || 0;
+    this.stats.averageGoals = teamData?.averageGoals || 0;
+    this.stats.winPercentage = Math.round(teamData?.winPercentage || 0);
   }
 
   createCharts(): void {

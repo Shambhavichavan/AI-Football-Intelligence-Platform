@@ -1,0 +1,48 @@
+<div class="players-page">
+  <h1>Player Intelligence</h1>
+
+  @if (analytics) {
+    <div class="analytics-grid">
+      <div class="card"><strong>Top Scorer:</strong> {{ analytics.topScorer }}</div>
+      <div class="card"><strong>Most Assists:</strong> {{ analytics.mostAssists }}</div>
+      <div class="card"><strong>Best Player:</strong> {{ analytics.bestPlayer }}</div>
+      <div class="card"><strong>Worst Form:</strong> {{ analytics.worstForm }}</div>
+      <div class="card"><strong>Average Rating:</strong> {{ analytics.averageRating }}</div>
+    </div>
+  }
+
+  @if (players.length > 0) {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Team</th>
+            <th>Goals</th>
+            <th>Assists</th>
+            <th>Shots</th>
+            <th>Minutes</th>
+            <th>Rating</th>
+            <th>YC</th>
+            <th>RC</th>
+            <th>Pass %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let player of players">
+            <td>{{ player.name }}</td>
+            <td>{{ player.team }}</td>
+            <td>{{ player.goals }}</td>
+            <td>{{ player.assists }}</td>
+            <td>{{ player.shots }}</td>
+            <td>{{ player.minutes }}</td>
+            <td>{{ player.rating }}</td>
+            <td>{{ player.yellowCards }}</td>
+            <td>{{ player.redCards }}</td>
+            <td>{{ player.passAccuracy }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

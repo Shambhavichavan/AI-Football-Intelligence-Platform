@@ -1,0 +1,48 @@
+<div class="predictions-page">
+  <h1>Match Prediction</h1>
+
+  <div class="controls">
+    <div class="field">
+      <label>Home</label>
+      <select [(ngModel)]="homeTeam">
+        <option *ngFor="let team of teams" [value]="team">{{ team }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Away</label>
+      <select [(ngModel)]="awayTeam">
+        <option *ngFor="let team of teams" [value]="team">{{ team }}</option>
+      </select>
+    </div>
+
+    <button (click)="predict()">Predict</button>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (prediction) {
+    <div class="result">
+      <h2>{{ prediction.home }} vs {{ prediction.away }}</h2>
+
+      <div class="bar-row">
+        <span>Home Win {{ prediction.homeWin }}%</span>
+        <div class="bar"><div class="fill home" [style.width.%]="prediction.homeWin"></div></div>
+      </div>
+
+      <div class="bar-row">
+        <span>Draw {{ prediction.draw }}%</span>
+        <div class="bar"><div class="fill draw" [style.width.%]="prediction.draw"></div></div>
+      </div>
+
+      <div class="bar-row">
+        <span>Away Win {{ prediction.awayWin }}%</span>
+        <div class="bar"><div class="fill away" [style.width.%]="prediction.awayWin"></div></div>
+      </div>
+
+      <p class="confidence">Confidence Score: {{ prediction.confidenceScore }}%</p>
+    </div>
+  }
+</div>

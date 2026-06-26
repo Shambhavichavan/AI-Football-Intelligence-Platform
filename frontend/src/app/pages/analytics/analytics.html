@@ -3,7 +3,7 @@
   
   <div class="team-selector">
     <label for="teamSelect">Select Team:</label>
-    <select id="teamSelect" [(ngModel)]="selectedTeam" (change)="onTeamChange($event.target.value)">
+    <select id="teamSelect" [(ngModel)]="selectedTeam" (change)="onTeamChange($event)">
       <option value="" disabled>Choose a team...</option>
       <option *ngFor="let team of teams" [value]="team">{{ team }}</option>
     </select>
@@ -36,6 +36,30 @@
       <div class="stat-card">
         <div class="stat-title">Goals Conceded</div>
         <div class="stat-value">{{ stats.goalsConceded }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Current Form</div>
+        <div class="stat-value">{{ currentForm }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Clean Sheets</div>
+        <div class="stat-value">{{ stats.cleanSheets }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Avg Goals</div>
+        <div class="stat-value">{{ stats.averageGoals }}</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <h3>Last 5 Results</h3>
+      <div class="form-badges">
+        <span class="badge win" *ngFor="let result of recentResults" [class.draw]="result === 'D'" [class.loss]="result === 'L'">
+          {{ result }}
+        </span>
+        @if (recentResults.length === 0) {
+          <span class="no-form">No completed matches yet</span>
+        }
       </div>
     </div>
   </div>
