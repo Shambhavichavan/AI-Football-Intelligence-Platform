@@ -8,6 +8,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -21,9 +23,16 @@ import java.security.cert.X509Certificate;
 @SpringBootApplication
 @EnableScheduling
 public class FootballIntelligenceBackendApplication {
+	private static final Logger log = LoggerFactory.getLogger(FootballIntelligenceBackendApplication.class);
 
 	private static void configureDatasourceFromDatabaseUrl() {
 		String springDatasourceUrl = System.getenv("SPRING_DATASOURCE_URL");
+		String sourceName = firstNonBlankName(
+				"DATABASE_PRIVATE_URL", System.getenv("DATABASE_PRIVATE_URL"),
+				"DATABASE_URL", System.getenv("DATABASE_URL"),
+				"POSTGRES_URL", System.getenv("POSTGRES_URL"),
+				"PGDATABASE_URL", System.getenv("PGDATABASE_URL")
+		);
 		String databaseUrl = firstNonBlank(
 				System.getenv("DATABASE_PRIVATE_URL"),
 				System.getenv("DATABASE_URL"),
@@ -32,10 +41,12 @@ public class FootballIntelligenceBackendApplication {
 		);
 
 		if (springDatasourceUrl != null && !springDatasourceUrl.isBlank()) {
+			log.info("Datasource configured from SPRING_DATASOURCE_URL");
 			return;
 		}
 
 		if (databaseUrl == null || databaseUrl.isBlank()) {
+			log.warn("No datasource URL env var found. Checked SPRING_DATASOURCE_URL, DATABASE_PRIVATE_URL, DATABASE_URL, POSTGRES_URL, PGDATABASE_URL");
 			return;
 		}
 
@@ -65,6 +76,8 @@ public class FootballIntelligenceBackendApplication {
 			}
 
 			System.setProperty("spring.datasource.url", jdbcUrl);
+			System.setProperty("spring.jpa.properties.hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+			log.info("Datasource derived from {} with host={}, port={}, database={}", sourceName, host, port, database);
 
 			String userInfo = uri.getUserInfo();
 			if (userInfo != null && !userInfo.isBlank()) {
@@ -78,6 +91,7 @@ public class FootballIntelligenceBackendApplication {
 			}
 		} catch (URISyntaxException ignored) {
 			// Keep defaults from application.properties when DATABASE_URL is invalid.
+			log.warn("Could not parse datasource URL from {}. Falling back to existing Spring datasource settings.", sourceName);
 		}
 	}
 
@@ -93,6 +107,23 @@ public class FootballIntelligenceBackendApplication {
 		}
 
 		return null;
+	}
+
+	private static String firstNonBlankName(String name1, String value1, String name2, String value2,
+			String name3, String value3, String name4, String value4) {
+		if (value1 != null && !value1.isBlank()) {
+			return name1;
+		}
+		if (value2 != null && !value2.isBlank()) {
+			return name2;
+		}
+		if (value3 != null && !value3.isBlank()) {
+			return name3;
+		}
+		if (value4 != null && !value4.isBlank()) {
+			return name4;
+		}
+		return "none";
 	}
 
 	private static void configureWindowsTrustStore() {
