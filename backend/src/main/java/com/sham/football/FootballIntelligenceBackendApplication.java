@@ -24,7 +24,12 @@ public class FootballIntelligenceBackendApplication {
 
 	private static void configureDatasourceFromDatabaseUrl() {
 		String springDatasourceUrl = System.getenv("SPRING_DATASOURCE_URL");
-		String databaseUrl = System.getenv("DATABASE_URL");
+		String databaseUrl = firstNonBlank(
+				System.getenv("DATABASE_PRIVATE_URL"),
+				System.getenv("DATABASE_URL"),
+				System.getenv("POSTGRES_URL"),
+				System.getenv("PGDATABASE_URL")
+		);
 
 		if (springDatasourceUrl != null && !springDatasourceUrl.isBlank()) {
 			return;
@@ -74,6 +79,20 @@ public class FootballIntelligenceBackendApplication {
 		} catch (URISyntaxException ignored) {
 			// Keep defaults from application.properties when DATABASE_URL is invalid.
 		}
+	}
+
+	private static String firstNonBlank(String... values) {
+		if (values == null) {
+			return null;
+		}
+
+		for (String value : values) {
+			if (value != null && !value.isBlank()) {
+				return value;
+			}
+		}
+
+		return null;
 	}
 
 	private static void configureWindowsTrustStore() {
