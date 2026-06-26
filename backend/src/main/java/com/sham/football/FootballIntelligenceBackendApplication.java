@@ -13,12 +13,68 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 @SpringBootApplication
 @EnableScheduling
 public class FootballIntelligenceBackendApplication {
+
+	private static void configureDatasourceFromDatabaseUrl() {
+		String springDatasourceUrl = System.getenv("SPRING_DATASOURCE_URL");
+		String databaseUrl = System.getenv("DATABASE_URL");
+
+		if (springDatasourceUrl != null && !springDatasourceUrl.isBlank()) {
+			return;
+		}
+
+		if (databaseUrl == null || databaseUrl.isBlank()) {
+			return;
+		}
+
+		try {
+			URI uri = new URI(databaseUrl);
+			String scheme = uri.getScheme();
+			if (scheme == null) {
+				return;
+			}
+
+			if (!"postgres".equalsIgnoreCase(scheme) && !"postgresql".equalsIgnoreCase(scheme)) {
+				return;
+			}
+
+			String host = uri.getHost();
+			int port = uri.getPort() == -1 ? 5432 : uri.getPort();
+			String path = uri.getPath() == null ? "" : uri.getPath();
+			String database = path.startsWith("/") ? path.substring(1) : path;
+
+			if (host == null || host.isBlank() || database.isBlank()) {
+				return;
+			}
+
+			String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + "/" + database;
+			if (uri.getQuery() != null && !uri.getQuery().isBlank()) {
+				jdbcUrl += "?" + uri.getQuery();
+			}
+
+			System.setProperty("spring.datasource.url", jdbcUrl);
+
+			String userInfo = uri.getUserInfo();
+			if (userInfo != null && !userInfo.isBlank()) {
+				String[] parts = userInfo.split(":", 2);
+				if (parts.length > 0 && !parts[0].isBlank()) {
+					System.setProperty("spring.datasource.username", parts[0]);
+				}
+				if (parts.length > 1 && !parts[1].isBlank()) {
+					System.setProperty("spring.datasource.password", parts[1]);
+				}
+			}
+		} catch (URISyntaxException ignored) {
+			// Keep defaults from application.properties when DATABASE_URL is invalid.
+		}
+	}
 
 	private static void configureWindowsTrustStore() {
 		String os = System.getProperty("os.name", "").toLowerCase();
@@ -62,6 +118,7 @@ public class FootballIntelligenceBackendApplication {
 
 	public static void main(String[] args) {
 		configureWindowsTrustStore();
+		configureDatasourceFromDatabaseUrl();
 		disableSSLVerification();
 		SpringApplication.run(FootballIntelligenceBackendApplication.class, args);
 	}
