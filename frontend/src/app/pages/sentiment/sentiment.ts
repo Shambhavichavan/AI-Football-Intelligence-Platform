@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Football } from '../../services/football';
@@ -42,7 +42,10 @@ export class Sentiment implements OnInit {
   message = '';
   submitting = false;
 
-  constructor(private footballService: Football) {}
+  constructor(
+    private footballService: Football,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadSentimentData();
@@ -53,20 +56,24 @@ export class Sentiment implements OnInit {
     this.footballService.getSentiments().subscribe({
       next: (data: any) => {
         this.records = Array.isArray(data) ? data : data?.value || [];
+        this.changeDetectorRef.detectChanges();
       },
       error: () => {
         this.records = [];
         this.loadError = 'Unable to load sentiment records. Please ensure backend is running on port 8080.';
+        this.changeDetectorRef.detectChanges();
       },
     });
 
     this.footballService.getSentimentSummary().subscribe({
       next: (data: any) => {
         this.summary = data;
+        this.changeDetectorRef.detectChanges();
       },
       error: () => {
         this.summary = null;
         this.loadError = 'Unable to load sentiment summary. Please ensure backend is running on port 8080.';
+        this.changeDetectorRef.detectChanges();
       },
     });
   }
@@ -85,10 +92,12 @@ export class Sentiment implements OnInit {
           this.message = '';
           this.submitting = false;
           this.loadSentimentData();
+          this.changeDetectorRef.detectChanges();
         },
         error: () => {
           this.submitting = false;
           this.submitError = 'Sentiment analysis failed. Please try again after confirming backend availability.';
+          this.changeDetectorRef.detectChanges();
         },
       });
   }
