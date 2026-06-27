@@ -26,6 +26,8 @@ public class FootballIntelligenceBackendApplication {
 	private static final Logger log = LoggerFactory.getLogger(FootballIntelligenceBackendApplication.class);
 
 	private static void configureDatasourceFromDatabaseUrl() {
+		logDatasourceEnvPresence();
+
 		String springDatasourceUrl = System.getenv("SPRING_DATASOURCE_URL");
 		String sourceName = firstNonBlankName(
 				"DATABASE_PRIVATE_URL", System.getenv("DATABASE_PRIVATE_URL"),
@@ -46,7 +48,7 @@ public class FootballIntelligenceBackendApplication {
 		}
 
 		if (databaseUrl == null || databaseUrl.isBlank()) {
-			log.warn("No datasource URL env var found. Checked SPRING_DATASOURCE_URL, DATABASE_PRIVATE_URL, DATABASE_URL, POSTGRES_URL, PGDATABASE_URL");
+			configureDatasourceFromSplitEnv();
 			return;
 		}
 
@@ -92,7 +94,81 @@ public class FootballIntelligenceBackendApplication {
 		} catch (URISyntaxException ignored) {
 			// Keep defaults from application.properties when DATABASE_URL is invalid.
 			log.warn("Could not parse datasource URL from {}. Falling back to existing Spring datasource settings.", sourceName);
+			configureDatasourceFromSplitEnv();
 		}
+	}
+
+	private static void logDatasourceEnvPresence() {
+		log.info(
+				"Datasource env presence: SPRING_DATASOURCE_URL={}, DATABASE_PRIVATE_URL={}, DATABASE_URL={}, POSTGRES_URL={}, PGDATABASE_URL={}, PGHOST={}, PGPORT={}, PGDATABASE={}, PGUSER={}, PGPASSWORD={}, POSTGRES_HOST={}, POSTGRES_PORT={}, POSTGRES_DB={}, POSTGRES_USER={}, POSTGRES_PASSWORD={}",
+				isPresent("SPRING_DATASOURCE_URL"),
+				isPresent("DATABASE_PRIVATE_URL"),
+				isPresent("DATABASE_URL"),
+				isPresent("POSTGRES_URL"),
+				isPresent("PGDATABASE_URL"),
+				isPresent("PGHOST"),
+				isPresent("PGPORT"),
+				isPresent("PGDATABASE"),
+				isPresent("PGUSER"),
+				isPresent("PGPASSWORD"),
+				isPresent("POSTGRES_HOST"),
+				isPresent("POSTGRES_PORT"),
+				isPresent("POSTGRES_DB"),
+				isPresent("POSTGRES_USER"),
+				isPresent("POSTGRES_PASSWORD")
+		);
+	}
+
+	private static boolean isPresent(String name) {
+		String value = System.getenv(name);
+		return value != null && !value.isBlank();
+	}
+
+	private static void configureDatasourceFromSplitEnv() {
+		String host = firstNonBlank(
+				System.getenv("PGHOST"),
+				System.getenv("POSTGRES_HOST"),
+				System.getenv("DB_HOST")
+		);
+		String port = firstNonBlank(
+				System.getenv("PGPORT"),
+				System.getenv("POSTGRES_PORT"),
+				System.getenv("DB_PORT")
+		);
+		String database = firstNonBlank(
+				System.getenv("PGDATABASE"),
+				System.getenv("POSTGRES_DB"),
+				System.getenv("DB_NAME")
+		);
+		String username = firstNonBlank(
+				System.getenv("PGUSER"),
+				System.getenv("POSTGRES_USER"),
+				System.getenv("DB_USER")
+		);
+		String password = firstNonBlank(
+				System.getenv("PGPASSWORD"),
+				System.getenv("POSTGRES_PASSWORD"),
+				System.getenv("DB_PASSWORD")
+		);
+
+		if (host == null || host.isBlank() || database == null || database.isBlank()) {
+			log.warn("No datasource env var found. Checked URL vars and split vars: PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD and POSTGRES_* aliases.");
+			return;
+		}
+
+		String effectivePort = (port == null || port.isBlank()) ? "5432" : port;
+		String jdbcUrl = "jdbc:postgresql://" + host + ":" + effectivePort + "/" + database;
+		System.setProperty("spring.datasource.url", jdbcUrl);
+		System.setProperty("spring.jpa.properties.hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+
+		if (username != null && !username.isBlank()) {
+			System.setProperty("spring.datasource.username", username);
+		}
+		if (password != null && !password.isBlank()) {
+			System.setProperty("spring.datasource.password", password);
+		}
+
+		log.info("Datasource derived from split env vars with host={}, port={}, database={}", host, effectivePort, database);
 	}
 
 	private static String firstNonBlank(String... values) {
